@@ -6,6 +6,10 @@
 #include "tools/tool_cron.h"
 #include "tools/tool_gpio.h"
 
+/* RGB 工具函数 */
+extern esp_err_t tool_rgb_init(void);
+extern esp_err_t tool_rgb_execute(const char *input_json, char *output, size_t output_size);
+
 #include <string.h>
 #include "esp_log.h"
 #include "cJSON.h"
@@ -16,11 +20,12 @@ static const char *TAG = "tools";
 
 static mimi_tool_t s_tools[MAX_TOOLS];
 static int s_tool_count = 0;
-static char *s_tools_json = NULL;  /* cached JSON array string */
+static char *s_tools_json = NULL; /* cached JSON array string */
 
 static void register_tool(const mimi_tool_t *tool)
 {
-    if (s_tool_count >= MAX_TOOLS) {
+    if (s_tool_count >= MAX_TOOLS)
+    {
         ESP_LOGE(TAG, "Tool registry full");
         return;
     }
@@ -32,13 +37,15 @@ static void build_tools_json(void)
 {
     cJSON *arr = cJSON_CreateArray();
 
-    for (int i = 0; i < s_tool_count; i++) {
+    for (int i = 0; i < s_tool_count; i++)
+    {
         cJSON *tool = cJSON_CreateObject();
         cJSON_AddStringToObject(tool, "name", s_tools[i].name);
         cJSON_AddStringToObject(tool, "description", s_tools[i].description);
 
         cJSON *schema = cJSON_Parse(s_tools[i].input_schema_json);
-        if (schema) {
+        if (schema)
+        {
             cJSON_AddItemToObject(tool, "input_schema", schema);
         }
 
@@ -214,6 +221,28 @@ esp_err_t tool_registry_init(void)
     };
     register_tool(&ga);
 
+    /* Register RGB tools */
+    tool_rgb_init(); // 初始化驱动
+
+    mimi_tool_t rgb = {
+        .name = "set_rgb_color",
+        .description = "Set the color of the WS2812 RGB LED using r, g, b values (0-255). "
+                       "CRITICAL RULE: There is NO separate brightness parameter! "
+                       "If the user asks to change brightness, YOU must scale the current RGB values mathematically. "
+                       "For example, if current color is (255, 0, 0) and user wants 50% brightness, you must call this tool with (127, 0, 0). "
+                       "To turn OFF the LED, you must send (0, 0, 0). Do NOT apologize or say you cannot control hardware.",
+        .input_schema_json =
+            "{\"type\":\"object\","
+            "\"properties\":{"
+            "\"r\":{\"type\":\"integer\",\"description\":\"Red value (0-255)\"},"
+            "\"g\":{\"type\":\"integer\",\"description\":\"Green value (0-255)\"},"
+            "\"b\":{\"type\":\"integer\",\"description\":\"Blue value (0-255)\"}"
+            "},"
+            "\"required\":[\"r\",\"g\",\"b\"]}",
+        .execute = tool_rgb_execute,
+    };
+    register_tool(&rgb);
+
     build_tools_json();
 
     ESP_LOGI(TAG, "Tool registry initialized");
@@ -228,8 +257,10 @@ const char *tool_registry_get_tools_json(void)
 esp_err_t tool_registry_execute(const char *name, const char *input_json,
                                 char *output, size_t output_size)
 {
-    for (int i = 0; i < s_tool_count; i++) {
-        if (strcmp(s_tools[i].name, name) == 0) {
+    for (int i = 0; i < s_tool_count; i++)
+    {
+        if (strcmp(s_tools[i].name, name) == 0)
+        {
             ESP_LOGI(TAG, "Executing tool: %s", name);
             return s_tools[i].execute(input_json, output, output_size);
         }

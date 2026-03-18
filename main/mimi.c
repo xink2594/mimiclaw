@@ -8,6 +8,7 @@
 #include "esp_heap_caps.h"
 #include "esp_spiffs.h"
 #include "nvs_flash.h"
+#include "esp_sntp.h"
 
 #include "mimi_config.h"
 #include "bus/message_bus.h"
@@ -172,6 +173,16 @@ void app_main(void)
         {
             wifi_ok = true;
             ESP_LOGI(TAG, "WiFi connected: %s", wifi_manager_get_ip());
+
+            // ========== SNTP 全局对时服务 ==========
+            // 强制设置为 UTC+8
+            setenv("TZ", "UTC-8", 1);
+            tzset();
+            esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
+            esp_sntp_setservername(0, "pool.ntp.org");
+            esp_sntp_setservername(1, "ntp.aliyun.com");
+            esp_sntp_init();
+            ESP_LOGI(TAG, "SNTP service initialized");
         }
         else
         {
