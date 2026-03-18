@@ -136,9 +136,9 @@ static esp_err_t fetch_time_direct(char *out, size_t out_size)
     time_header_ctx_t ctx = {0};
 
     esp_http_client_config_t config = {
-        .url = "https://api.telegram.org/",
+        .url = "https://www.baidu.com/",
         .method = HTTP_METHOD_HEAD,
-        .timeout_ms = 10000,
+        .timeout_ms = 3000,
         .crt_bundle_attach = esp_crt_bundle_attach,
         .event_handler = time_http_event_handler,
         .user_data = &ctx,
