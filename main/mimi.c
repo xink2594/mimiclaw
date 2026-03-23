@@ -143,8 +143,6 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(init_spiffs());
 
-    // 初始化 OLED 屏幕，显示 [ SYSTEM BOOT ]
-    if (oled_init() != ESP_OK)
     {
         ESP_LOGE(TAG, "OLED initialization failed, but continuing system boot...");
     }
