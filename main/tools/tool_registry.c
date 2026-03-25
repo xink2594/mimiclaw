@@ -8,6 +8,7 @@
 
 // 1
 #include "tools/tool_rgb.h"
+#include "tools/tool_weather.h"
 
 /* RGB 工具函数 */
 extern esp_err_t tool_rgb_init(void);
@@ -245,6 +246,29 @@ esp_err_t tool_registry_init(void)
         .execute = tool_rgb_execute,
     };
     register_tool(&rgb);
+
+    /* 注册天气查询工具 */
+    mimi_tool_t wn = {
+        .name = "get_weather_now",
+        .description = "Get the real-time weather conditions and temperature for a specific city.",
+        .input_schema_json =
+            "{\"type\":\"object\","
+            "\"properties\":{\"location\":{\"type\":\"string\",\"description\":\"City name in pinyin or Chinese (e.g., beijing, 杭州), or 'ip' for device current location\"}},"
+            "\"required\":[\"location\"]}",
+        .execute = tool_weather_now_execute,
+    };
+    register_tool(&wn);
+
+    mimi_tool_t w_forecast = {
+        .name = "get_weather_forecast",
+        .description = "Get the 3-day weather forecast (including today, tomorrow, and the day after). Call this to answer questions about future weather, temperature ranges, or whether it will rain.",
+        .input_schema_json =
+            "{\"type\":\"object\","
+            "\"properties\":{\"location\":{\"type\":\"string\",\"description\":\"City name in pinyin/Chinese. Leave EMPTY to query the device's current location.\"}},"
+            "\"required\":[\"location\"]}", // <--- 关键点：数组为空，意味着参数是可选的
+        .execute = tool_weather_daily_execute,
+    };
+    register_tool(&w_forecast);
 
     build_tools_json();
 

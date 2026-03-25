@@ -16,6 +16,8 @@
 
 static const char *TAG = "agent";
 
+#define TOOL_OUTPUT_SIZE (8 * 1024)
+
 /* Build the assistant content array from llm_response_t for the messages history.
  * Returns a cJSON array with text and tool_use blocks. */
 static cJSON *build_assistant_content(const llm_response_t *resp)
@@ -336,8 +338,6 @@ static void agent_loop_task(void *arg)
             {
                 final_text = NULL;
             }
-
-            
         }
         else
         {
@@ -357,7 +357,6 @@ static void agent_loop_task(void *arg)
                 }
             }
         }
-
 
         /* Free inbound message content */
         free(msg.content);

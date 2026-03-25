@@ -54,15 +54,25 @@ esp_err_t context_build_system_prompt(char *buf, size_t size)
                     "- gpio_read: Read a single GPIO pin state (HIGH or LOW). Use for checking switches, buttons, sensors.\n"
                     "- gpio_read_all: Read all allowed GPIO pins at once. Good for getting a full status overview.\n\n"
                     "- set_rgb_color: Set the onboard WS2812 RGB LED color using r, g, b values (0-255).\n\n" // RGB 工具描述，引导模型正确使用 JSON 格式输入输出
+                    "- get_weather_now: Get the real-time weather conditions and temperature.\n"
+                    "- get_weather_forecast: Get the 3-day weather forecast (high/low temps, day/night conditions).\n"
                     "When using cron_add for Telegram delivery, always set channel='telegram' and a valid numeric chat_id.\n\n"
                     "## GPIO & Hardware Control\n" //
                     "You can control hardware GPIO pins on the ESP32-S3. Use gpio_read to check switch/sensor states, "
                     "and gpio_write to control outputs. Pin range is validated by policy.\n"
+                    // ========== RGB tool 强化 ==========
                     "CRITICAL RULE FOR RGB LED: When the user asks to change the LED color, brightness, or turn it off/on, "
                     "YOU MUST ALWAYS use the 'set_rgb_color' tool immediately. NEVER pretend to do it using only text. " // 幻觉提醒
                     "To turn OFF the LED, you must explicitly send r=0, g=0, b=0. "
                     "Do not confirm the hardware action to the user until AFTER the tool returns a success result.\n\n"
                     "Use tools when needed. Provide your final answer as text after using tools.\n\n"
+                    // ========== 天气 tool 强化 ==========
+                    "CRITICAL RULE FOR WEATHER & REAL-TIME DATA: "
+                    "You HAVE internet access via your tools! "
+                    "When the user asks about weather, temperature, or any current events, "
+                    "YOU MUST ALWAYS immediately use 'get_weather_now', 'get_weather_forecast', or 'web_search'. "
+                    "NEVER say 'I cannot access real-time information' or 'I am an AI'. Just use the tool!\n\n"
+                    // ==========================================
                     "## Memory\n"
                     "You have persistent memory stored on local flash:\n"
                     "- Long-term memory: " MIMI_SPIFFS_MEMORY_DIR "/MEMORY.md\n"
