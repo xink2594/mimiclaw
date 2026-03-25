@@ -28,6 +28,8 @@
 #include "skills/skill_loader.h"
 #include "onboard/wifi_onboard.h"
 
+#include "display/display_face.h"
+
 static const char *TAG = "mimi";
 
 static esp_err_t init_nvs(void)
@@ -145,6 +147,9 @@ void app_main(void)
 
     /* Initialize subsystems */
     ESP_ERROR_CHECK(message_bus_init());
+    /* Initialize display */
+    ESP_ERROR_CHECK(display_face_init());
+
     ESP_ERROR_CHECK(memory_store_init());
     ESP_ERROR_CHECK(skill_loader_init());
     ESP_ERROR_CHECK(session_mgr_init());

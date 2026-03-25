@@ -6,6 +6,8 @@
 #include "memory/session_mgr.h"
 #include "tools/tool_registry.h"
 
+#include "display/display_face.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
@@ -263,6 +265,9 @@ static void agent_loop_task(void *arg)
             }
 #endif
 
+            /* 思考状态 */
+            display_set_mood(1);
+
             llm_response_t resp;
             err = llm_chat_tools(system_prompt, messages, tools_json, &resp);
 
@@ -303,6 +308,9 @@ static void agent_loop_task(void *arg)
         }
 
         cJSON_Delete(messages);
+
+        /* 思考结束 --> 发呆状态 */
+        display_set_mood(0);
 
         /* 5. Send response */
         if (final_text && final_text[0])

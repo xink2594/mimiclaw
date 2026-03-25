@@ -16,3 +16,6 @@ dependencies:
   #   public: true
   espressif/esp_websocket_client: ^1.4.0
   espressif/led_strip: ^3.0.0
+  lvgl/lvgl: '*'
+  espressif/esp_lvgl_port: '*'
+  jbrilha/esp_lcd_st7789: '*'
